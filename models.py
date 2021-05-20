@@ -14,6 +14,7 @@ def slugify(s):
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tg_id = db.Column(db.String(15), unique=True)
+    status = db.Column(db.Integer, default=0)
     subscription = db.Column(db.Integer, default=0)
     registration = db.Column(db.DateTime, default=datetime.now())
     success = bool()
@@ -59,33 +60,14 @@ class Users(db.Model):
             self.subscription = subscription
         self.commit()
 
-    def get_user(self, user_id=None, tg_id=None):
-        """
-        get_user by id or tg_id.
-        :param user_id:
-        :param tg_id:
-        :return: dict{'id', 'tg_id', 'subscription'}
-
-        """
+    def get(user_id=None, tg_id=None):
         try:
-            if user_id:
-                self.id = user_id
-                # user = Users.query.filter(Users.id == self.id).one()
-            elif tg_id:
-                self.tg_id = tg_id
-                user = Users.query.filter(Users.tg_id == self.tg_id).one()
-            else:
-                return dict()
-            self.success = True
+            if id:
+                return Users.query.filter(Users.id == str(user_id)).one()
+            if tg_id:
+                return Users.query.filter(Users.tg_id == str(tg_id)).one()
         except sqlalchemy.exc.NoResultFound:
-            self.success = False
-
-        if self.success:
-            self.id = user.id
-            self.tg_id = user.tg_id
-            self.subscription = user.subscription
-
-        return {'id': self.id, 'tg_id': self.tg_id, 'subscription': self.subscription}
+            return None
 
     def get_json(self):
         """
